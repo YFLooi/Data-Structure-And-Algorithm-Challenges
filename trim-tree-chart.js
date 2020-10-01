@@ -77,64 +77,78 @@ const newTree2 = [
 ]
 
 //What this does is assemble a new tree using bits from the existing tree
-let branchStore = [];
-
 let pushCounter = 0;
 let loopCounter = 0;
 const idList = [0,1,2,3,4,5]
-let targetId = 2;
+const targetId = 2;
+let idMap = [];
+
 function treeTrimmer(branch){
   const result = [];
 
-  // for(const prop in branch){
-  //   console.log(`Contents in current branch: ${JSON.stringify(branch)}`);
-  //   const value = branch[prop];
-
-  //   //If array, means still needs to be processed
-  //   if(typeof value === 'object'){
-  //     console.log(`Value to be pushed: ${JSON.stringify(value)}`)
-  //     result.push(value);
-  //     result.push(treeTrimmer(value));
-  //   }
-  //   // //If array, means still needs to be processed
-  //   // if(Array.isArray(value)){ 
-  //   //   console.log(`Array to be iterated: ${JSON.stringify(value)}`)
-  //   //   result.push(treeTrimmer(value));
-  //   // //If object, can decide to cut or not
-  //   // } else if(typeof value === 'object'){
-  //   //   console.log(`Value to be pushed: ${JSON.stringify(value)}`)
-  //   //   result.push(value);
-  //   //   result.push(treeTrimmer(value));
-  //   // }
-  // }
   for(const [key, value] of Object.entries(branch)){
-    //console.log(`${key}: ${JSON.stringify(value)}`);
-
     //Push into next iteration if children are present
     //This prevents blank arrays from appearing in result[] 
     //Cannot add ' && "children" in value' as a condition, loop will not check leaf nodes
+    loopCounter += 1;
+
+    console.log(`Current iteration: ${loopCounter}`);
     if(typeof value === 'object'){
       console.log(`Branch to push to next level: ${JSON.stringify(value)}`);
-      result.push(treeTrimmer(value));
+
+      let valueToCheck = value;
+      if(value.id === targetId && "children" in value){
+        delete valueToCheck["id"]; 
+        delete valueToCheck["children"]; 
+      //Must put this condition here, otherwise "children" will be missed
+      } else if(value.id === targetId){
+        delete valueToCheck["id"];
+      }
+
+      result.push(treeTrimmer(valueToCheck));
     } else {
+      console.log(`Current content in result[]: ${JSON.stringify(result)}`);
       console.log(`Branch to push to results[]: ${JSON.stringify(branch)}`);
       pushCounter += 1; //= number of leaf nodes
-      if(branch.id === targetId){
-        delete branch["id"]; 
-        delete branch["children"]; 
+
+      //check if "children" are present
+      if("children" in branch){
+        result.push({["id"]:value});
       } else {
-        result.push(branch);
+        //result.push({["children"]:[{[key]:value}]});
+        result.push({["id"]:value});
       }
+      
     }
-    loopCounter += 1;
+  }
+  idMap = [...result];
+  return result;
+}
+let newObj = [];
+function objBuilder(outputMap){
+  console.log(`\nCurrent input: ${JSON.stringify(outputMap)}`)
+  console.log(`\n${outputMap[0].length}`)
+
+  for(i=0; i<outputMap.length; ++i){
+    if(outputMap.length === 2){
+      const {id, children} = outputMap[i];
+      newObj = [...newObj, {["id"]:id, ["children"]:children}];
+      //objBuilder(children);
+    } else if(outputMap.length === 1){
+      const id = outputMap[i];
+      newObj = [...newObj, {["id"]:id}];
+    }
 
   }
 
-  return result;
 }
 
 const objMap = treeTrimmer(newTree1);
 console.log(JSON.stringify(objMap));
 //console.log(Object.keys(newTree1[0]));
-console.log(`loop ran ${loopCounter} times`)
-console.log(`result.push() done ${pushCounter} times`)
+console.log(`loop ran ${loopCounter} times`);
+console.log(`result.push() done ${pushCounter} times`);
+console.log(`resulting idMap: ${JSON.stringify(idMap)}`);
+// objBuilder(idMap);
+// console.log(`newObj: ${JSON.stringify(newObj)}`);
+
