@@ -1,15 +1,12 @@
-/** Ideas? 
-  Convert to JSON?
-  https://stackoverflow.com/questions/15523514/find-by-key-deep-in-a-nested-array
-  Recursion?
-  https://stackoverflow.com/questions/17554768/sort-json-objects-into-nested-tree
-  https://stackoverflow.com/questions/11922383/how-can-i-access-and-process-nested-objects-arrays-or-json
-  Iterating objects in JS
-  https://attacomsian.com/blog/javascript-iterate-objects
+/**
+ * Challenge question: Given orgChartMap below, build a function that removes
+ * objects by id, then updates orgChartMap and positionIds.
+ * Any children of the removed object should join to the next higher id
+ * Ex: If id===2 is removed, {id:4, children:[{id:6},{id:7}]} becomes the child of {id:1}
+ */
 
-*/
-
-const inputTree = [
+//This tree has only a single origin parent/parent of parents at id===1
+const orgChartMap = [
   {
     id: 1,
     children: [
@@ -39,98 +36,8 @@ const inputTree = [
     ]
   }
 ]
+const positionIds = [1,2,3,4,5,6,7,8]
 
-const newTree1 = [
-  {
-    id: 1,
-    children: [
-      {id: 2},
-      {id: 3}
-    ]
-  },
-  {
-    id: 4,
-    children: [
-      {id: 5}
-    ]
-  },
-]
-const newTree2 = [
-  {
-    id: 0,
-    children: [
-      {
-        id: 1,
-        children: [
-          {id: 2},
-          {id: 3}
-        ]
-      },
-      {
-        id: 4,
-        children: [
-          {id: 5}
-        ]
-      }
-    ]
-  }
-]
-const newTree3 = [
-  {id: 1},
-  {id: 2},
-  {id: 3}
-]
-const newTree4 = [
-  {
-    id: 1,
-    children: [
-      {
-        id: 2,
-        children: [
-          {
-            id: 3,
-            children: [
-              {id: 4},
-              {id: 5}
-            ]
-          },       
-        ]
-      },
-      { 
-        id: 6,
-        children: [
-          {id: 7 },
-          {id: 8}
-        ]
-      }
-    ]
-  },
-]
-const newTree5 = [
-  {
-    id: 1,
-    children: [
-      {id: 2},
-      {id: 3}
-    ]
-  },
-  {
-    id: 4,
-    children:[
-      {id: 5},
-      {
-        id: 6,
-        children: [
-          {id: 7},
-          {id: 8}
-        ]
-      }
-    ]
-  },
-]
-
-const idList = [1,2,3,4,5,6,7,8]
-const targetId = 2;
 /**
  * What this does is to first iterate over every branch then leaf in the tree to find the 
  * branch/leaf with id === removalTarget. Once removalTarget is dealt with, the entire tree is
@@ -263,9 +170,6 @@ function treeTrimmer(branch, counter, removalTarget){
       }
 
     }
-
-    //This call only moves to the next top parent branch
-    trimmerFunction(branch, counter+1, removalTarget, null)
   }
 
   trimmerFunction(branch, counter, removalTarget, null);
@@ -320,15 +224,21 @@ function treeTrimmer(branch, counter, removalTarget){
     }
   }
 
-  //Remove id of removalTarget from idList
-  const indexOfId = idList.findIndex(id => id === removalTarget);
-  console.log(`id to remove located at index ${indexOfId} of idList`);
-  idList.splice(indexOfId, 1);
+  //Remove id of removalTarget from positionIds
+  const indexOfId = positionIds.findIndex(id => id === removalTarget);
+  console.log(`id to remove located at index ${indexOfId} of positionIds`);
+  positionIds.splice(indexOfId, 1);
 
   return result;
 }
 
-const objMap = treeTrimmer(newTree3, 0, 999);
-console.log(`Output objMap: ${JSON.stringify(objMap)}`);
-console.log(`New idList: ${JSON.stringify(idList)}`);
+const newOrgChartMap = treeTrimmer(orgChartMap, 0, 2);
+//Assign newOrgChartMap to orgChartMap
+orgChartMap.splice(0, orgChartMap.length, newOrgChartMap);
+
+//Final result:
+//Show new list of positionIds
+console.log(`New positionIds: ${JSON.stringify(positionIds)}`);
+console.log(`New orgChartMap: ${JSON.stringify(orgChartMap)}`);
+
 
