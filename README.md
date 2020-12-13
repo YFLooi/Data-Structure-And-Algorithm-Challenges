@@ -1,2 +1,2 @@
 # Data-Structure-And-Algorithm-Challenges
-Solutions to various problems related to algorithms and data structures
+Solutions to common interview problems related to algorithms and data structures
